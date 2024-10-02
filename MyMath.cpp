@@ -1,4 +1,27 @@
 #include "MyMath.h"
+#include "Novice.h"
+
+static const int kRowHeight = 20;
+static const int kColumnWidth = 80;
+
+// 表示(Vector3)
+void MyMath::VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
+
+	Novice::ScreenPrintf(x, y, "%3.2f", vector.x);
+	Novice::ScreenPrintf(x + kColumnWidth, y, "%3.2f", vector.y);
+	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%3.2f", vector.z);
+	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
+}
+
+// 表示(Matrix4x4)
+void MyMath::MatrixScreenPrintf(int x, int y, Matrix4x4 matrix) {
+	for (int row = 0; row < 4; row++) {
+		for (int column = 0; column < 4; column++) {
+			Novice::ScreenPrintf(
+				x + column * kColumnWidth, y + row * kRowHeight, "%.03f", matrix.m[row][column]);
+		}
+	}
+}
 
 // π
 float MyMath::GetPI() { return (float)M_PI; }
@@ -419,4 +442,42 @@ Matrix4x4 MyMath::MakeViewportMatrix(
 	viewportMatrix.m[3][3] = 1.0f;
 
 	return viewportMatrix;
+}
+
+Matrix4x4 MyMath::MakeRotateAxisAngle(const Vector3& axis, float angle)
+{
+	// 回転軸を正規化
+	Vector3 normAxis = Normalize(axis);
+
+	float x = normAxis.x;
+	float y = normAxis.y;
+	float z = normAxis.z;
+
+	float cosAngle = cos(angle);
+	float sinAngle = sin(angle);
+	float oneMinusCos = 1.0f - cosAngle;
+
+	Matrix4x4 result;
+
+	result.m[0][0] = cosAngle + x * x * oneMinusCos;
+	result.m[0][1] = x * y * oneMinusCos + z * sinAngle; // 修正: + z * sinAngle
+	result.m[0][2] = x * z * oneMinusCos - y * sinAngle; // 修正: - y * sinAngle
+	result.m[0][3] = 0.0f;
+
+	result.m[1][0] = y * x * oneMinusCos - z * sinAngle; // 修正: - z * sinAngle
+	result.m[1][1] = cosAngle + y * y * oneMinusCos;
+	result.m[1][2] = y * z * oneMinusCos + x * sinAngle; // 修正: + x * sinAngle
+	result.m[1][3] = 0.0f;
+
+	result.m[2][0] = z * x * oneMinusCos + y * sinAngle; // 修正: + y * sinAngle
+	result.m[2][1] = z * y * oneMinusCos - x * sinAngle; // 修正: - x * sinAngle
+	result.m[2][2] = cosAngle + z * z * oneMinusCos;
+	result.m[2][3] = 0.0f;
+
+	result.m[3][0] = 0.0f;
+	result.m[3][1] = 0.0f;
+	result.m[3][2] = 0.0f;
+	result.m[3][3] = 1.0f;
+
+	return result;
 }
