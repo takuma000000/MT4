@@ -23,6 +23,53 @@ void MyMath::MatrixScreenPrintf(int x, int y, Matrix4x4 matrix) {
 	}
 }
 
+Matrix4x4 MyMath::DirectionToDirection(const Vector3& from, const Vector3& to)
+{
+	// 1. ベクトルを正規化
+	Vector3 fromNormalized = Normalize(from);
+	Vector3 toNormalized = Normalize(to);
+
+	// 2. 回転軸の計算（クロス積）
+	Vector3 rotationAxis = fromNormalized.cross(toNormalized);
+	rotationAxis = Normalize(rotationAxis);  // 回転軸を正規化
+
+	// 3. 内積から回転角を計算
+	float cosTheta = fromNormalized.dot(toNormalized);
+	cosTheta = std::fmax(-1.0f, std::fmin(1.0f, cosTheta)); // Clamp the value
+	float angle = std::acos(cosTheta);
+
+	// 4. 回転行列の生成（ロドリゲスの回転公式を使用）
+	Matrix4x4 rotationMatrix;
+
+	float s = std::sin(angle);
+	float c = std::cos(angle);
+	float t = 1.0f - c;
+
+	// 回転行列の成分を設定
+	rotationMatrix.m[0][0] = t * rotationAxis.x * rotationAxis.x + c;
+	rotationMatrix.m[0][1] = t * rotationAxis.x * rotationAxis.y - s * rotationAxis.z;
+	rotationMatrix.m[0][2] = t * rotationAxis.x * rotationAxis.z + s * rotationAxis.y;
+	rotationMatrix.m[0][3] = 0.0f;
+
+	rotationMatrix.m[1][0] = t * rotationAxis.x * rotationAxis.y + s * rotationAxis.z;
+	rotationMatrix.m[1][1] = t * rotationAxis.y * rotationAxis.y + c;
+	rotationMatrix.m[1][2] = t * rotationAxis.y * rotationAxis.z - s * rotationAxis.x;
+	rotationMatrix.m[1][3] = 0.0f;
+
+	rotationMatrix.m[2][0] = t * rotationAxis.x * rotationAxis.z - s * rotationAxis.y;
+	rotationMatrix.m[2][1] = t * rotationAxis.y * rotationAxis.z + s * rotationAxis.x;
+	rotationMatrix.m[2][2] = t * rotationAxis.z * rotationAxis.z + c;
+	rotationMatrix.m[2][3] = 0.0f;
+
+	rotationMatrix.m[3][0] = 0.0f;
+	rotationMatrix.m[3][1] = 0.0f;
+	rotationMatrix.m[3][2] = 0.0f;
+	rotationMatrix.m[3][3] = 1.0f; // 同次座標のための1
+
+	return rotationMatrix;
+}
+
+
 // π
 float MyMath::GetPI() { return (float)M_PI; }
 

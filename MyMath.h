@@ -88,4 +88,7 @@ public:
 
 	//MatrixScreenPrintf
 	static void MatrixScreenPrintf(int x, int y, Matrix4x4 matrix);
+
+	//ある方向からある方向への回転
+	static Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to);
 };
