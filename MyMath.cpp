@@ -30,11 +30,11 @@ Matrix4x4 MyMath::DirectionToDirection(const Vector3& from, const Vector3& to)
 	Vector3 toNormalized = Normalize(to);
 
 	// 2. 回転軸の計算（クロス積）
-	Vector3 rotationAxis = fromNormalized.cross(toNormalized);
+	Vector3 rotationAxis = fromNormalized.Cross(toNormalized);
 	rotationAxis = Normalize(rotationAxis);  // 回転軸を正規化
 
 	// 3. 内積から回転角を計算
-	float cosTheta = fromNormalized.dot(toNormalized);
+	float cosTheta = fromNormalized.Dot(toNormalized);
 	cosTheta = std::fmax(-1.0f, std::fmin(1.0f, cosTheta)); // Clamp the value
 	float angle = std::acos(cosTheta);
 
